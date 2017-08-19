@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="1.0"
+	xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd">
+	<persistence-unit name="contacts" transaction-type="RESOURCE_LOCAL">
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+
+		<class>com.rkc.zds.dto.ContactDto</class>
+		<class>com.rkc.zds.dto.UserDto</class>
+		<class>com.rkc.zds.dto.AuthorityDto</class>
+		<class>com.rkc.zds.dto.GroupDto</class>
+		
+		<properties>
+			<property name="hibernate.connection.url" value="jdbc:derby:C:/_/data/pcm/derbyDB" />
+			<property name="hibernate.connection.driver_class" value="org.apache.derby.jdbc.EmbeddedDriver" />
+			<property name="hibernate.dialect" value="org.hibernate.dialect.DerbyDialect" />
+			<!-- <property name="hibernate.hbm2ddl.auto" value="create"/> -->
+			<property name="hibernate.connection.userName" value="PCM" />
+			<property name="hibernate.connection.password" value="PCM" />
+			
+			<!-- Specific the default schema to connect  
+			<property name="hibernate.default_schema" value="PCM" /> -->
+			<!-- Specific the default schema to connect 
+			<property name="hibernate.default_catalog" value="PCM" /> -->
+
+			<!-- These properties must be set to use the correct schema -->
+			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:derby:C:/_/data/pcm/derbyDB" />
+			<property name="javax.persistence.jdbc.user" value="PCM" />
+			<property name="javax.persistence.jdbc.password" value="PCM" />
+
+			<property name="hibernate.show_sql" value="true" />
+			<property name="hibernate.connection.username" value="PCM" />
+
+		</properties>
+
+	</persistence-unit>
+</persistence>
+

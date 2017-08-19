@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:security="http://www.springframework.org/schema/security"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+    http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.0.xsd">
+
+    <security:global-method-security secured-annotations="enabled" />
+
+
+    <security:http auto-config="false" use-expressions="true" >
+
+        <security:intercept-url pattern="/" access="permitAll" />
+        <security:intercept-url pattern="/contacts/**" access="isAuthenticated()" /> 
+<!--        <security:intercept-url pattern="/protected/**" access="hasRole('ROLE_ADMIN')" /> -->
+
+        <security:form-login login-page="/login" authentication-failure-url="/login?error=403" default-target-url="/protected/home" />
+
+        <security:logout invalidate-session="true" logout-success-url="/login" logout-url="/logout" />
+    
+    	<security:csrf disabled="true"/>
+    	
+    </security:http>
+<!--  
+    <security:authentication-manager>
+        <security:authentication-provider>
+            <security:jdbc-user-service
+                    data-source-ref="myContactDataSource"
+                    users-by-username-query="select email, password, enabled from system_user where email = ?"
+                    authorities-by-username-query="select u.email as login, u.user_role as role from system_user u where u.email = ?" />
+        </security:authentication-provider>
+    </security:authentication-manager>
+    
+    
+    <security:authentication-manager >
+        <security:authentication-provider>
+            <security:user-service>
+                <security:user name="guest"  password="Password6"  authorities="ROLE_USER" />
+                <security:user name="admin" password="root123" authorities="ROLE_ADMIN" />
+                <security:user name="dba"   password="root123" authorities="ROLE_ADMIN,ROLE_DBA" />
+                <security:user name="rcampion" password="Password6" authorities="ROLE_ADMIN,ROLE_DBA" />
+
+            </security:user-service>
+        </security:authentication-provider>
+    </security:authentication-manager>
+-->
+
+<!--  
+	<security:authentication-manager>
+	  <security:authentication-provider>
+		<security:jdbc-user-service data-source-ref="dataSource"
+		  users-by-username-query=
+		    "select username,password, enabled from users where username=?"
+		  authorities-by-username-query=
+		    "select username, role from user_roles where username =?  " />
+	  </security:authentication-provider>
+	</security:authentication-manager>        
+-->
+	<security:authentication-manager>
+		<security:authentication-provider user-service-ref="myUserDetailsService" >
+			<security:password-encoder hash="bcrypt" />    
+		</security:authentication-provider>
+	</security:authentication-manager>
+</beans:beans>
