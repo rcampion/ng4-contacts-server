@@ -14,6 +14,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +32,9 @@ import com.rkc.zds.dto.ContactDto;
 import com.rkc.zds.service.ContactService;
 
 @RestController
+//@EnableGlobalMethodSecurity(prePostEnabled = true)
+//@EnableWebSecurity
+//@EnableGlobalMethodSecurity(prePostEnabled = true)
 @RequestMapping(value = "/api/contact")
 public class ContactController {
 
@@ -69,10 +77,15 @@ public class ContactController {
 		return new ResponseEntity<>(page, HttpStatus.OK);
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(value = "", method = RequestMethod.POST, consumes = {
 			"application/json;charset=UTF-8" }, produces = { "application/json;charset=UTF-8" })
 	public void createContact(@RequestBody String jsonString) {
 
+		
+		//test		
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		
 		ObjectMapper mapper = new ObjectMapper();
 
 		ContactDto contactDTO = new ContactDto();
@@ -92,6 +105,7 @@ public class ContactController {
 		contactService.saveContact(contactDTO);
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(value = "", method = RequestMethod.PUT, consumes = {
 			"application/json;charset=UTF-8" }, produces = { "application/json;charset=UTF-8" })
 	public void updateContact(@RequestBody String jsonString) {
@@ -115,6 +129,7 @@ public class ContactController {
 
 	}
 	
+	@PreAuthorize("hasAuthority('ADMIN')")	
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public String deleteContact(@PathVariable int id) {
 		contactService.deleteContact(id);

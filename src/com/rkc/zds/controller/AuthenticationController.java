@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-@CrossOrigin(origins = "http://localhost:4200")
+//@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping(value = "/api")
 public class AuthenticationController {
@@ -34,19 +34,20 @@ public class AuthenticationController {
     public UserDto authenticate(@RequestBody LoginDTO loginDTO, HttpServletResponse response) throws Exception{
     	//String clientOrigin = request.getHeader("origin");
 //createDefaultAccount();
-//    	response.setHeader("Access-Control-Allow-Origin","http://localhost:4200");
+    	response.setHeader("Access-Control-Allow-Origin","http://localhost:4200");
+    	response.setHeader("Access-Control-Allow-Credentials", "true");
     	return authenticationService.authenticate(loginDTO,response);
     }
 
     private void createDefaultAccount() {
         UserDto user = new UserDto();
 //        user.setId(1);
-        user.setLogin("richard.campion");
-        user.setUserName("richard.campion");
-        user.setFirstName("Richard");
-        user.setLastName("Campion");
+        user.setLogin("Guest");
+        user.setUserName("Guest");
+        user.setFirstName("Guest");
+        user.setLastName("Testing");
 //        user.setProfile(Profile.ADMIN);
-        user.setPassword("MonkeyBrains");
+        user.setPassword("Testing");
 //        user.setAuthorities(authorities.get(user.getProfile()));
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);

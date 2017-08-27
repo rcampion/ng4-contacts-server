@@ -3,6 +3,8 @@ package com.rkc.zds.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.web.config.EnableSpringDataWebSupport;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -11,12 +13,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.mvc.WebContentInterceptor;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
-import org.springframework.web.servlet.view.tiles2.TilesConfigurer;
-import org.springframework.web.servlet.view.tiles2.TilesViewResolver;
-import com.rkc.zds.mvc.CORSFilter;
 
 @Configuration
 @EnableWebMvc
+@EnableSpringDataWebSupport
+@EnableGlobalMethodSecurity(securedEnabled = true)
 @ComponentScan(basePackages = { "com.rkc.zds" })
 public class WebAppConfig extends WebMvcConfigurerAdapter {
 

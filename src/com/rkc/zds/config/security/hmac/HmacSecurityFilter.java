@@ -55,7 +55,19 @@ public class HmacSecurityFilter extends GenericFilterBean {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
-
+/* test
+        String test = request.getRequestURI();
+        String test2 = request.getPathInfo();
+        
+        if(request.getRequestURI().equalsIgnoreCase("/ng4-contacts-server/api/logout")) {
+        	return;
+        }
+        
+        if(request.getRequestURI().equalsIgnoreCase("/ng4-contacts-server/api/authenticate")) {
+        	return;
+        }
+//test
+*/        
         WrappedRequest wrappedRequest = new WrappedRequest(request);
 
         try {

@@ -7,6 +7,7 @@ import com.rkc.zds.dto.UserDto;
 //import fr.redfroggy.hmac.mock.MockUsers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,9 +18,12 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.util.*;
@@ -68,9 +72,27 @@ public class AuthenticationService {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
+		} catch (AuthenticationCredentialsNotFoundException x) {
+			try {
+				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+				return null;
+			} catch (IOException e2) {
+				// TODO Auto-generated catch block
+				e2.printStackTrace();
+			}			
 		}
+		
+		
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-
+//test		
+		authentication = SecurityContextHolder.getContext().getAuthentication();
+		
+	    // Create a new session and add the security context.
+		ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+	    HttpSession session = attr.getRequest().getSession(true);
+	    session.setAttribute("SPRING_SECURITY_CONTEXT", authentication);
+//test
+	    
 		// Retrieve security user after authentication
 		UserDetails userDetails = userDetailsService.loadUserByUsername(loginDTO.getLogin());
 
@@ -113,6 +135,10 @@ public class AuthenticationService {
 		// Add jwt cookie
 		Cookie jwtCookie = new Cookie(JWT_APP_COOKIE, hmacToken.getJwt());
 		jwtCookie.setPath("/");
+		//jwtCookie.setDomain("source.zdslogic.com");
+		//jwtCookie.setDomain("127.0.0.1");
+		//jwtCookie.setDomain("localhost");
+		//jwtCookie.setSecure(false);
 		jwtCookie.setMaxAge(20 * 60);
 		// Cookie cannot be accessed via JavaScript
 		jwtCookie.setHttpOnly(true);
@@ -128,7 +154,7 @@ public class AuthenticationService {
 		// UserDto userDTO = new UserDto();
 		userDTO.setId(securityUser.getId());
 		userDTO.setLogin(securityUser.getUsername());
-//		userDTO.setAuthorities(authorities);
+//		userDTO.setAuthorities(securityUser.getAuthorities());
 		userDTO.setProfile(securityUser.getProfile());
 		return userDTO;
 	}

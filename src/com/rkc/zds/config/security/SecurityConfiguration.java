@@ -4,8 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -23,6 +25,7 @@ import com.rkc.zds.service.AuthenticationService;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 	@Autowired
 	@Qualifier("userDetailsService")
@@ -47,12 +50,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring()
+        		.antMatchers("/api/logout")
                 .antMatchers("/scripts/**/*.{js}")
                 .antMatchers("/node_modules/**")
                 .antMatchers("/assets/**")
                 .antMatchers("*.{ico}")
-                .antMatchers("/views/**/*.{html}")
-                .antMatchers("/app/**/*.{html}");
+                .antMatchers("/views/**/*.{html}");
+                
+                //.antMatchers("/app/**/*.{html}");
     }
 
     @Override
@@ -62,7 +67,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
                     .antMatchers("/api/authenticate").anonymous()
                     .antMatchers("/").anonymous()
                     .antMatchers("/favicon.ico").anonymous()
+                    .antMatchers("/api/logout").anonymous()
                     .antMatchers("/api/**").authenticated()
+                    .antMatchers(HttpMethod.POST, "/api/contact").hasRole("ADMIN")
+                    .antMatchers(HttpMethod.DELETE, "/api/contact").hasRole("ADMIN")
+                    .antMatchers(HttpMethod.PUT, "/api/contact").hasRole("ADMIN")
                 .and()
                 .csrf()
                     .disable()
@@ -79,6 +88,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
                 .and()
                     .apply(hmacSecurityConfigurer());
     }
+
+    
+//    webSecurityBuilder.ignoring()
+ // ignore all URLs that start with /resources/ or /static/
+//            .antMatchers("/resources/**", "/static/**");
 
     @Bean
     @Override
