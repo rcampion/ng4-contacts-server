@@ -17,7 +17,9 @@ xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/
 <!--  
             com.rkc.zds.config.AppConfig, com.rkc.zds.config.WebAppConfig, com.rkc.zds.config.WebSocketAppConfig, com.rkc.zds.config.SecurityConfig
 -->
-            com.rkc.zds.config.AppConfig
+            com.rkc.zds.config.AppConfig,
+            com.rkc.zds.config.WebAppConfig,
+            com.rkc.zds.config.security.SecurityConfiguration
             
 <!--              , 
             com.rkc.zds.config.WebAppConfig, 

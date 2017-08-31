@@ -1,10 +1,14 @@
 package com.rkc.zds.service;
 
+import com.rkc.zds.config.security.SecurityProperties;
 import com.rkc.zds.config.security.SecurityUser;
 import com.rkc.zds.config.security.hmac.*;
 import com.rkc.zds.dto.LoginDTO;
 import com.rkc.zds.dto.UserDto;
-//import fr.redfroggy.hmac.mock.MockUsers;
+
+import com.rkc.zds.config.security.SecurityUtils;
+import com.rkc.zds.config.security.hmac.HmacUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -22,6 +26,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -31,12 +36,16 @@ import java.util.*;
 @Service
 public class AuthenticationService {
 
-	public static final String JWT_APP_COOKIE = "hmac-app-jwt";
+	//public static final String JWT_APP_COOKIE = "hmac-app-jwt";
 	public static final String CSRF_CLAIM_HEADER = "X-HMAC-CSRF";
+    public static final String ACCESS_TOKEN_COOKIE = "access_token";
 	public static final String JWT_CLAIM_LOGIN = "login";
 
 	@Autowired
 	private AuthenticationManager authenticationManager;
+
+//    @Autowired
+    private SecurityProperties securityProperties = SecurityProperties.getInstance();
 
 	@Autowired
 	private UserDetailsService userDetailsService;
@@ -58,10 +67,12 @@ public class AuthenticationService {
 	 * @return UserDTO instance
 	 * @throws HmacException
 	 */
-	public UserDto authenticate(LoginDTO loginDTO, HttpServletResponse response) throws HmacException {
+//	public UserDto authenticate(LoginDTO loginDTO, HttpServletResponse response) throws HmacException {
+	public UserDto authenticate(LoginDTO loginDTO, HttpServletRequest request, HttpServletResponse response) throws HmacException {
 		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
 				loginDTO.getLogin(), loginDTO.getPassword());
 		Authentication authentication = null;
+
 		try {
 			authentication = authenticationManager.authenticate(authenticationToken);
 		} catch (BadCredentialsException e) {
@@ -81,18 +92,9 @@ public class AuthenticationService {
 				e2.printStackTrace();
 			}			
 		}
-		
-		
+				
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-//test		
-		authentication = SecurityContextHolder.getContext().getAuthentication();
-		
-	    // Create a new session and add the security context.
-		ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-	    HttpSession session = attr.getRequest().getSession(true);
-	    session.setAttribute("SPRING_SECURITY_CONTEXT", authentication);
-//test
-	    
+ 
 		// Retrieve security user after authentication
 		UserDetails userDetails = userDetailsService.loadUserByUsername(loginDTO.getLogin());
 
@@ -117,34 +119,48 @@ public class AuthenticationService {
 		customClaims.put(CSRF_CLAIM_HEADER, csrfId);
 
 		// Generate a random secret
-		String privateSecret = HmacSigner.generateSecret();
-		String publicSecret = HmacSigner.generateSecret();
+//		String privateSecret = HmacSigner.generateSecret();
+//		String publicSecret = HmacSigner.generateSecret();
 
-		// Jwt is generated using the private key
-		HmacToken hmacToken = HmacSigner.getSignedToken(privateSecret, String.valueOf(securityUser.getId()),
-				HmacSecurityFilter.JWT_TTL, customClaims);
+        //Get jwt secret from properties
+        String jwtSecret = securityProperties.getJwt().getSecret();
+
+        //Get hmac secret from config
+        String hmacSharedSecret = securityProperties.getHmac().getSecret();
+		
+        // Jwt is generated using the secret defined in configuration file
+        HmacToken hmacToken = SecurityUtils.getSignedToken(jwtSecret,loginDTO.getLogin(), SecurityService.JWT_TTL,customClaims);
 
 		for (UserDto userDto : userService.getUsers()) {
 			if (userDto.getId() == (securityUser.getId())) {
 				// Store in cache both private and public secrets
-				userDto.setPublicSecret(publicSecret);
-				userDto.setPrivateSecret(privateSecret);
+				userDto.setPublicSecret(jwtSecret);
+				userDto.setPrivateSecret(hmacSharedSecret);
 			}
 		}
 
 		// Add jwt cookie
-		Cookie jwtCookie = new Cookie(JWT_APP_COOKIE, hmacToken.getJwt());
-		jwtCookie.setPath("/");
+		//Cookie jwtCookie = new Cookie(JWT_APP_COOKIE, hmacToken.getJwt());
+		//jwtCookie.setPath("/");
 		//jwtCookie.setDomain("source.zdslogic.com");
 		//jwtCookie.setDomain("127.0.0.1");
 		//jwtCookie.setDomain("localhost");
 		//jwtCookie.setSecure(false);
-		jwtCookie.setMaxAge(20 * 60);
+		//jwtCookie.setMaxAge(20 * 60);
 		// Cookie cannot be accessed via JavaScript
-		jwtCookie.setHttpOnly(true);
+		//jwtCookie.setHttpOnly(true);
+		
+        // Add jwt as a cookie
+        Cookie jwtCookie = new Cookie(ACCESS_TOKEN_COOKIE, hmacToken.getJwt());
+        //jwtCookie.setPath(request.getContextPath().length() > 0 ? request.getContextPath() : "/");
+        System.out.println("request.getContextPath:"+request.getContextPath());
+        jwtCookie.setPath("/");
+        jwtCookie.setMaxAge(securityProperties.getJwt().getMaxAge());
+        //Cookie cannot be accessed via JavaScript
+        jwtCookie.setHttpOnly(true);		
 
 		// Set public secret and encoding in headers
-		response.setHeader(HmacUtils.X_SECRET, publicSecret);
+		response.setHeader(HmacUtils.X_SECRET, hmacSharedSecret);
 		response.setHeader(HttpHeaders.WWW_AUTHENTICATE, HmacUtils.HMAC_SHA_256);
 		response.setHeader(CSRF_CLAIM_HEADER, csrfId);
 
@@ -192,5 +208,10 @@ public class AuthenticationService {
 		UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(details,
 				details.getPassword(), details.getAuthorities());
 		SecurityContextHolder.getContext().setAuthentication(authToken);
+	}
+
+	public UserDto findByUserName(String login) {
+		UserDto userDTO = userService.findByUserName(login);
+		return userDTO;
 	}
 }

@@ -5,9 +5,10 @@ import com.rkc.zds.repository.UserRepository;
 import com.rkc.zds.config.security.hmac.HmacException;
 import com.rkc.zds.config.security.hmac.HmacSigner;
 import com.rkc.zds.config.security.hmac.HmacUtils;
-//import fr.redfroggy.hmac.mock.MockUsers;
 import com.rkc.zds.controller.AuthenticationController;
 import com.rkc.zds.service.AuthenticationService;
+import com.rkc.zds.service.SecurityService;
+import com.rkc.zds.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
@@ -25,30 +26,22 @@ import java.text.ParseException;
 
 public class XAuthTokenFilter extends GenericFilterBean{
 
+    private SecurityService securityService;
+
     private AuthenticationService authenticationService;
 
-    public XAuthTokenFilter(AuthenticationService authenticationService){
-       this.authenticationService = authenticationService;
-    }
+//    public XAuthTokenFilter(AuthenticationService authenticationService){
+//       this.authenticationService = authenticationService;
+//    }
+    XAuthTokenFilter(SecurityService securityService){
+        this.securityService = securityService;
+     }
+    
     @Autowired
     private UserRepository userRepository;
     
-    /**
-     * Find a cookie which contain a JWT
-     * @param request current http request
-     * @return Cookie found, null otherwise
-     */
-    private Cookie findJwtCookie(HttpServletRequest request) {
-        if(request.getCookies() == null || request.getCookies().length == 0) {
-            return null;
-        }
-        for(Cookie cookie : request.getCookies()) {
-            if(cookie.getName().contains(AuthenticationService.JWT_APP_COOKIE)) {
-                return cookie;
-            }
-        }
-        return null;
-    }
+    @Autowired
+    private UserService userService;
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -61,15 +54,39 @@ public class XAuthTokenFilter extends GenericFilterBean{
         } else {
 
             try {
+                this.securityService.verifyJwt(request);
 
-                Cookie jwtCookie = findJwtCookie(request);
+                filterChain.doFilter(request,response);
+            } catch (HmacException | ParseException e) {
+                e.printStackTrace();
+                response.setStatus(403);
+            }
+        }
+
+    }
+/*    
+    @Override
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+
+        HttpServletRequest request = (HttpServletRequest) servletRequest;
+        HttpServletResponse response = (HttpServletResponse) servletResponse;
+
+        if (!request.getRequestURI().contains("/api") || request.getRequestURI().contains("/api/authenticate")){
+            filterChain.doFilter(request, response);
+        } else {
+
+            try {
+
+                Cookie jwtCookie = SecurityUtils.findJwtCookie(request);
                 Assert.notNull(jwtCookie,"No jwt cookie found");
 
                 String jwt = jwtCookie.getValue();
                 String login = HmacSigner.getJwtClaim(jwt, AuthenticationService.JWT_CLAIM_LOGIN);
                 Assert.notNull(login,"No login found in JWT");
                 
-                UserDto userDTO = userRepository.findByUserName(login);
+                //UserDto userDTO = userRepository.findByUserName(login);
+                //UserDto userDTO = this.userService.findByUserName(login);
+                UserDto userDTO = this.authenticationService.findByUserName(login);
                 
                 Assert.notNull(userDTO,"No user found with login: "+login);
 
@@ -94,5 +111,5 @@ public class XAuthTokenFilter extends GenericFilterBean{
             }
         }
 
-    }
+    }*/
 }

@@ -129,7 +129,7 @@ public class ContactController {
 
 	}
 	
-	@PreAuthorize("hasAuthority('ADMIN')")	
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public String deleteContact(@PathVariable int id) {
 		contactService.deleteContact(id);

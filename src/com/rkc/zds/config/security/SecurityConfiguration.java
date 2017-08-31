@@ -22,11 +22,17 @@ import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import com.rkc.zds.config.security.hmac.HmacRequester;
 import com.rkc.zds.config.security.hmac.HmacSecurityConfigurer;
 import com.rkc.zds.service.AuthenticationService;
+import com.rkc.zds.service.SecurityService;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
+
+	@Autowired
+	@Qualifier("securityService")
+	private SecurityService securityService;
+
 	@Autowired
 	@Qualifier("userDetailsService")
 	UserDetailsService userDetailsService;
@@ -87,6 +93,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
                     .apply(authTokenConfigurer())
                 .and()
                     .apply(hmacSecurityConfigurer());
+//                .and().exceptionHandling().accessDeniedPage("/Access_Denied");
     }
 
     
@@ -99,13 +106,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
-
+    
     private HmacSecurityConfigurer hmacSecurityConfigurer(){
-        return new HmacSecurityConfigurer(hmacRequester);
+        return new HmacSecurityConfigurer(securityService);
     }
 
     private XAuthTokenConfigurer authTokenConfigurer(){
-        return new XAuthTokenConfigurer(authenticationService);
+        return new XAuthTokenConfigurer(securityService);
     }
     
 	private CsrfTokenRepository csrfTokenRepository() {

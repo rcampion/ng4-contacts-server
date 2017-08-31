@@ -5,14 +5,17 @@ import com.rkc.zds.dto.UserDto;
 import com.rkc.zds.service.AuthenticationService;
 import com.rkc.zds.service.UserService;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.CrossOrigin;
+//import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,7 +32,7 @@ public class AuthenticationController {
 
     @Autowired
     private AuthenticationService authenticationService;
-
+/*
     @RequestMapping(value = "/authenticate",method = RequestMethod.POST)
     public UserDto authenticate(@RequestBody LoginDTO loginDTO, HttpServletResponse response) throws Exception{
     	//String clientOrigin = request.getHeader("origin");
@@ -38,7 +41,15 @@ public class AuthenticationController {
     	response.setHeader("Access-Control-Allow-Credentials", "true");
     	return authenticationService.authenticate(loginDTO,response);
     }
+*/    
+    @RequestMapping(value = "/authenticate",method = RequestMethod.POST)
+    public UserDto authenticate(@RequestBody LoginDTO loginDTO, HttpServletRequest request, HttpServletResponse response) throws Exception{
+//    	response.setHeader("Access-Control-Allow-Origin","https://www.zdslogic.com");
+//    	response.setHeader("Access-Control-Allow-Credentials", "true");
 
+    	return authenticationService.authenticate(loginDTO, request, response);
+    }
+    
     private void createDefaultAccount() {
         UserDto user = new UserDto();
 //        user.setId(1);
