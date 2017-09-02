@@ -3,6 +3,7 @@
 xmlns="http://xmlns.jcp.org/xml/ns/javaee" 
 xmlns:jsp="http://java.sun.com/xml/ns/javaee/jsp" 
 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="WebApp_ID" version="3.1">
+
   <display-name>ng4-contacts-server</display-name>
   <servlet>
     <servlet-name>SpringServlet</servlet-name>
@@ -14,22 +15,11 @@ xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/
     <init-param>
       <param-name>contextConfigLocation</param-name>
       <param-value>
-<!--  
-            com.rkc.zds.config.AppConfig, com.rkc.zds.config.WebAppConfig, com.rkc.zds.config.WebSocketAppConfig, com.rkc.zds.config.SecurityConfig
--->
+
             com.rkc.zds.config.AppConfig,
             com.rkc.zds.config.WebAppConfig,
             com.rkc.zds.config.security.SecurityConfiguration
-            
-<!--              , 
-            com.rkc.zds.config.WebAppConfig, 
-            com.rkc.zds.config.WebSocketAppConfig, 
-            com.rkc.zds.config.security.SecurityConfiguration
- ,
-            com.rkc.zds.config.security.SecurityWebApplicationInitializer
-
-			com.rkc.zds.config.mvc.MvcWebApplicationInitializer
--->			
+            		
         </param-value>
     </init-param>
     <async-supported>true</async-supported>
@@ -78,7 +68,7 @@ xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/
     <servlet-name>SpringServlet</servlet-name>
     <url-pattern>/</url-pattern>
   </servlet-mapping>
-  
+
 <filter>
   <filter-name>springSecurityFilterChain</filter-name>
   <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>

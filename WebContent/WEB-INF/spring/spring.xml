@@ -6,36 +6,7 @@
 						   http://www.springframework.org/schema/context http://www.springframework.org/schema/task/spring-context-3.0.xsd
 						   http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.0.xsd"
        xmlns:security="http://www.springframework.org/schema/security" >
-       
-    <!-- Basic Configurations 
-    <context:annotation-config/>
 
-    <context:component-scan base-package="com.rkc.zds.model"/>
-    <context:component-scan base-package="com.rkc.zds.model.internal"/>
-    <context:component-scan base-package="com.rkc.zds.repository"/>
-    <context:component-scan base-package="com.rkc.zds.service"/>
-    <context:component-scan base-package="com.rkc.zds.service.impl"/>
-    <context:component-scan base-package="com.rkc.zds.controller"/>
-
-    <context:component-scan base-package="com.rkc.zds"/>
-    <context:component-scan base-package="com.rkc.zds.service.impl"/>
-    <context:component-scan base-package="com.rkc.zds.repository"/>
-
-
-    <context:annotation-config/>
-    
-    <context:component-scan base-package="com.rkc.zds"/>
-    <context:component-scan base-package="com.rkc.zds.controller"/>
-    <context:component-scan base-package="com.rkc.zds.service"/>
-    <context:component-scan base-package="com.rkc.zds.service.impl"/>
-
-    <context:annotation-config/>
-    
-    <context:component-scan base-package="com.rkc.zds.repository"/>
-    <context:component-scan base-package="com.rkc.zds.service"/>
-    <context:component-scan base-package="com.rkc.zds.service.impl"/>
-    <context:component-scan base-package="com.rkc.zds.interceptor"/>
--->
     <context:annotation-config/>
     <context:component-scan base-package="com.rkc.zds"/>
             
@@ -86,3 +57,4 @@
 </security:global-method-security>
 
 </beans>
+
