@@ -5,6 +5,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,18 +44,33 @@ public class ContactServiceImpl implements ContactService {
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public void saveContact(ContactDto contact) {
+		
+		//test		
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		
 		repo.save(contact);
 	}
 
 	@Override
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public void updateContact(ContactDto contact) {
+		
+		//test		
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		
 		repo.saveAndFlush(contact);
 	}
 
 	@Transactional
 	@Override
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public void deleteContact(int id) {
+		
+		//test		
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		
 		repo.delete(id);
 	}
 

@@ -63,14 +63,7 @@ public class ContactController {
 		ContactDto contact = contactService.getContact(id);
 		return new ResponseEntity<>(contact, HttpStatus.OK);
 	}
-
-/*	@RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<ContactDto> getContact(@PathVariable String id, HttpServletRequest req) {
-		int idInt = Integer.parseInt(id);
-		ContactDto contact = contactService.getContact(idInt);
-		return new ResponseEntity<>(contact, HttpStatus.OK);
-	}
-*/	
+	
 	@RequestMapping(value = "/search/{name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Page<ContactDto>> searchContact(@PathVariable String name, Pageable pageRequest) {
 		Page<ContactDto> page = contactService.searchContacts(name);
