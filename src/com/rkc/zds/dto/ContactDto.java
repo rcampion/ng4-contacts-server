@@ -104,4 +104,25 @@ public class ContactDto implements java.io.Serializable {
 		this.company = company;
 	}
 
+	@Override
+	public int hashCode() {
+	    int hash = 3;
+	    hash = 53 * hash + (this.id);
+	    return hash;
+	}
+
+	@Override
+	public boolean equals(Object other) {
+	    boolean result;
+	    if((other == null) || (getClass() != other.getClass())){
+	        result = false;
+	    } // end if
+	    else{
+	        ContactDto otherContact = (ContactDto)other;
+	        result = (id == (otherContact.id));
+	    } // end else
+
+	    return result;
+	}
+
 }

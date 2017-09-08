@@ -14,6 +14,8 @@ public interface ContactService {
 
     Page<ContactDto> searchContacts(String name);
 
+    Page<ContactDto> findFilteredContacts(Pageable pageable, int groupId);
+    
     @Transactional     
     ContactDto getContact(int id);    
 
