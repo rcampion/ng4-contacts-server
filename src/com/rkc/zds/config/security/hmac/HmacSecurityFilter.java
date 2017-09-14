@@ -1,5 +1,6 @@
 package com.rkc.zds.config.security.hmac;
 
+import com.rkc.zds.config.security.SecurityUtils;
 import com.rkc.zds.config.security.WrappedRequest;
 import com.rkc.zds.service.AuthenticationService;
 import com.rkc.zds.service.SecurityService;
@@ -59,7 +60,10 @@ public class HmacSecurityFilter extends GenericFilterBean {
 			 */
 			else {
 				if(securityService.verifyJwt(wrappedRequest)) {
-					 filterChain.doFilter(wrappedRequest, response); 
+
+
+			        
+			        filterChain.doFilter(wrappedRequest, response); 
 				}
 			}
 		} catch (Exception e) {

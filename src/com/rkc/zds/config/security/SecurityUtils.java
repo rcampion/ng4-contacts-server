@@ -18,11 +18,15 @@ import com.rkc.zds.service.SecurityService;
 import org.apache.commons.codec.binary.Base64;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
@@ -264,7 +268,7 @@ public class SecurityUtils {
 			String jwtSecret = securityProperties.getJwt().getSecret();	
 			LoginDTO loginDTO = new LoginDTO();
 			loginDTO.setLogin("richard.campion");
-			// Get Hmac signed token
+			// Create Hmac signed token
 			String csrfId = UUID.randomUUID().toString();
 			Map<String, String> customClaims = new HashMap<>();
 			customClaims.put(HmacSigner.ENCODING_CLAIM_PROPERTY, HmacUtils.HMAC_SHA_256);
@@ -285,5 +289,31 @@ public class SecurityUtils {
             }
         }
         return null;
+    }
+    
+    public static Cookie createCookie() throws HmacException {
+    	Cookie jwtCookie = null;
+    	
+		String jwtSecret = securityProperties.getJwt().getSecret();
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String login = auth.getName();
+		
+        LoginDTO loginDTO = new LoginDTO();
+		loginDTO.setLogin(login);
+		String csrfId = UUID.randomUUID().toString();
+		Map<String, String> customClaims = new HashMap<>();
+		customClaims.put(HmacSigner.ENCODING_CLAIM_PROPERTY, HmacUtils.HMAC_SHA_256);
+		customClaims.put(AuthenticationService.JWT_CLAIM_LOGIN, loginDTO.getLogin());
+		customClaims.put(AuthenticationService.CSRF_CLAIM_HEADER, csrfId);
+		HmacToken hmacToken = SecurityUtils.getSignedToken(jwtSecret,loginDTO.getLogin(), SecurityService.JWT_TTL,customClaims);
+		
+		jwtCookie = new Cookie(AuthenticationService.ACCESS_TOKEN_COOKIE, hmacToken.getJwt());
+        jwtCookie.setPath("/");
+        jwtCookie.setMaxAge(securityProperties.getJwt().getMaxAge());
+        //Cookie cannot be accessed via JavaScript
+        jwtCookie.setHttpOnly(true);
+        
+        return jwtCookie;
     }
 }

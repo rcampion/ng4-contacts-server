@@ -55,7 +55,11 @@ public class XAuthTokenFilter extends GenericFilterBean{
 
             try {
                 this.securityService.verifyJwt(request);
-
+                
+				//update the cookie;
+		        Cookie jwtCookie = SecurityUtils.createCookie();
+		        response.addCookie(jwtCookie);
+		        
                 filterChain.doFilter(request,response);
             } catch (HmacException | ParseException e) {
                 e.printStackTrace();
