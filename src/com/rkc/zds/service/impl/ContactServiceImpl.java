@@ -68,9 +68,14 @@ public class ContactServiceImpl implements ContactService {
 			}
 		}
 
-		PageRequest pageRequest = new PageRequest(0, filteredList.size());
+		int size = filteredList.size();
+		if(size == 0) {
+			size = 1;
+		}
+		
+		PageRequest pageRequest = new PageRequest(0, size);
 
-		PageImpl<ContactDto> page = new PageImpl<ContactDto>(filteredList, pageRequest, filteredList.size());
+		PageImpl<ContactDto> page = new PageImpl<ContactDto>(filteredList, pageRequest, size);
 
 		return page;
 	}
