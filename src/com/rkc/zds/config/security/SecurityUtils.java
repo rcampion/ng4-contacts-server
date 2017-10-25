@@ -258,7 +258,8 @@ public class SecurityUtils {
 
     	System.out.println("request.getRemoteHost():"+request.getRemoteHost());
 //    	if(request.getRemoteHost().equalsIgnoreCase("0:0:0:0:0:0:0:1")) {
-    	if(request.getRemoteHost().equalsIgnoreCase("127.0.0.1")) { 
+    	if((request.getRemoteHost().equalsIgnoreCase("127.0.0.1")) || 
+    	   (request.getRemoteHost().equalsIgnoreCase("0:0:0:0:0:0:0:1"))) { 
     		TESTING=true;
     	}
     	
