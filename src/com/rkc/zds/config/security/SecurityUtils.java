@@ -256,8 +256,9 @@ public class SecurityUtils {
     public static Cookie findJwtCookie(HttpServletRequest request) throws HmacException {
     	boolean TESTING = false;
 
-    	//System.out.println("request.getRemoteHost():"+request.getRemoteHost());
-    	if(request.getRemoteHost().equalsIgnoreCase("0:0:0:0:0:0:0:1")) {   	
+    	System.out.println("request.getRemoteHost():"+request.getRemoteHost());
+//    	if(request.getRemoteHost().equalsIgnoreCase("0:0:0:0:0:0:0:1")) {
+    	if(request.getRemoteHost().equalsIgnoreCase("127.0.0.1")) { 
     		TESTING=true;
     	}
     	
